@@ -1,5 +1,6 @@
 {
   "name": "wroxy",
+  "version": "0.0.1",
   "author": "Yury Michurin <yury@nix.co.il>",
   "scripts": {
     "test": "jest"
