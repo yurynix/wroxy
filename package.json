@@ -1,4 +1,6 @@
 {
+  "name": "wroxy",
+  "author": "Yury Michurin <yury@nix.co.il>",
   "scripts": {
     "test": "jest"
   },
