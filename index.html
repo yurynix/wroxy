@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <script type="text/javascript">
+      function WebSocketTest() {
+        if ("WebSocket" in window) {
+          console.log("WebSocket is supported by your Browser!");
+
+          // https://chrome-devtools-frontend.appspot.com/serve_file/@65d20b8e6b1e34d2687f4367477b92e89867c6f5/inspector.html?ws=localhost:1337/devtools/page/8BD4752AE953B2C4B9D2AFB654587461&experiments=true&remoteFrontend=true
+          // Let us open a web socket
+          const ws = new WebSocket("ws://127.0.0.1:1337");
+
+          ws.onopen = function () {
+            console.log("onopen");
+            // Web Socket is connected, send data using send()
+            ws.send("Message to send");
+            console.log("Message is sent...");
+          };
+
+          ws.onmessage = function (evt) {
+            const received_msg = evt.data;
+            console.log("Message is received...", received_msg);
+          };
+
+          ws.onclose = function () {
+            // websocket is closed.
+            console.log("Connection is closed...");
+          };
+
+          ws.onerror = function (err) {
+            console.log(`Error`, err, err.message);
+          };
+        } else {
+          // The browser doesn't support WebSocket
+          console.log("WebSocket NOT supported by your Browser!");
+        }
+      }
+
+      WebSocketTest();
+    </script>
+  </head>
+
+  <body>
+    <div id="sse">
+      <a href="javascript:WebSocketTest()">Run WebSocket</a>
+    </div>
+  </body>
+</html>
