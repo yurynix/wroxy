@@ -1,7 +1,8 @@
 const crypto = require("crypto");
 const http = require("http");
-//const path = require("path");
-//const { invokeScriptInDebuggedProcess } = require("./utils");
+const { debuglog } = require('util');
+
+const log = debuglog('wroxy-client');
 
 function connectToWS({ port, host, path }) {
   return new Promise((resolve, reject) => {
@@ -21,10 +22,14 @@ function connectToWS({ port, host, path }) {
     remoteReq.end();
 
     remoteReq.on("upgrade", (res, remoteSocket, upgradeHead) => {
+      log(`connectToWS() -> remoteReq to ${host}:${port} got upgrade`);
       resolve(remoteSocket);
     });
 
-    remoteReq.on("error", (error) => reject(error));
+    remoteReq.on("error", (error) => {
+      log(`connectToWS() -> remoteReq to ${host}:${port} got error ${error}`);
+      reject(error);
+    });
   });
 }
 
@@ -36,6 +41,7 @@ async function tunnel(server, local) {
   });
 
   serverSocket.once("data", async (data) => {
+    log(`tunnel() -> serverSocket ${serverSocket.host}:${server.port}${server.path} got data`);
     serverSocket.pause();
 
     const localSocket = await connectToWS({
@@ -54,32 +60,6 @@ async function tunnel(server, local) {
 
   return serverSocket;
 }
-
-// (async function main() {
-//   const scriptPath = path.resolve("./__tests__/fixtures/example-script.js");
-//   const result = await invokeScriptInDebuggedProcess(scriptPath);
-
-//   console.log(`Debugger: ${JSON.stringify(result)}`);
-
-//   const serverSocket = await tunnel(
-//     {
-//       port: 1234,
-//       host: "127.0.0.1",
-//       path: "/_tunnel/123456",
-//     },
-//     {
-//       port: result.port,
-//       host: "127.0.0.1",
-//       path: `/${result.guid}`,
-//     }
-//   );
-
-//   serverSocket.on("close", () => {
-//     console.log(`Server socket have been closed!`);
-//     process.kill(result.pid);
-//   });
-// })();
-
 
 module.exports = {
   tunnel

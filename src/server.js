@@ -1,5 +1,8 @@
 const http = require("http");
 const crypto = require("crypto");
+const { debuglog } = require('util');
+
+const log = debuglog('wroxy-server');
 
 const PORT = 1234;
 const HOST = "127.0.0.1";
@@ -30,12 +33,13 @@ function createServer(options) {
     });
 
     server.on("upgrade", async (req, socket, head) => {
-      console.log(
-        `>>> UPGRADE ${req.url} ${JSON.stringify(
+      log(
+        `>>> Client ${req.connection.remoteAddress} UPGRADE ${req.url} ${JSON.stringify(
           req.headers
         )} head: ${head.toString()}`
       );
       if (req.url.indexOf("/_tunnel/") === -1) {
+        log(`${req.connection.remoteAddress} missing tunnel`);
         return socket.write(getErrorReplay(`Missing tunnel`));
       }
 
@@ -47,22 +51,22 @@ function createServer(options) {
       );
 
       const onTunnelTermination = () => {
-        console.log(`tunnelId: ${tunnelId} onTunnelTermination`);
+        log(`tunnelId: ${tunnelId} onTunnelTermination`);
         tunnelMap.delete(tunnelId);
       };
 
       socket.on("close", () => {
-        console.log("close");
+        log("close");
         onTunnelTermination();
       });
 
       if (tunnelMap.has(tunnelId)) {
-        console.log(`connecting ${tunnelId}`);
+        log(`connecting ${tunnelId}`);
         const remoteSocket = tunnelMap.get(tunnelId);
         socket.pipe(remoteSocket);
         remoteSocket.pipe(socket);
       } else {
-        console.log(`New tunnel ${tunnelId} awaits...`);
+        log(`New tunnel ${tunnelId} awaits...`);
         tunnelMap.set(tunnelId, socket);
       }
     });
@@ -73,7 +77,7 @@ function createServer(options) {
         return reject(err);
       }
 
-      console.log(`Listening on ${server.address().port}`);
+      log(`Listening on ${server.address().port}`);
       resolve(server);
     });
   });
