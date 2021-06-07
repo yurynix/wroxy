@@ -1,10 +1,11 @@
 const crypto = require("crypto");
 const http = require("http");
+const https = require("https");
 const { debuglog } = require('util');
 
 const log = debuglog('wroxy-client');
 
-function connectToWS({ port, host, path }) {
+function connectToWS({ port, host, path, ssl }) {
   return new Promise((resolve, reject) => {
     const options = {
       port,
@@ -18,7 +19,7 @@ function connectToWS({ port, host, path }) {
       },
     };
 
-    const remoteReq = http.request(options);
+    const remoteReq = ssl ? https.request(options) : http.request(options);
     remoteReq.end();
 
     remoteReq.on("upgrade", (res, remoteSocket, upgradeHead) => {
@@ -38,6 +39,7 @@ async function tunnel(server, local) {
     port: server.port,
     host: server.host,
     path: server.path,
+    ssl: server.ssl,
   });
 
   serverSocket.once("data", async (data) => {
@@ -48,6 +50,7 @@ async function tunnel(server, local) {
       port: local.port,
       host: local.host,
       path: local.path,
+      ssl: local.ssl,
     });
 
     localSocket.write(data);

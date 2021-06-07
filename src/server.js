@@ -1,4 +1,5 @@
 const http = require("http");
+const https = require("https");
 const crypto = require("crypto");
 const { debuglog } = require('util');
 
@@ -26,8 +27,15 @@ function createServer(options) {
   return new Promise((resolve, reject) => {
     const tunnelMap = new Map();
 
+    const httpFactory = (options.key && options.cert) ? https : http;
+
     // Create an HTTP server
-    const server = http.createServer((req, res) => {
+    const server = httpFactory.createServer(options, (req, res) => {
+      log(
+        `>>> Client ${req.remoteAddress} regular connection to: ${req.url} headers: ${JSON.stringify(
+          req.headers
+        )}`
+      );
       res.writeHead(400, { "Content-Type": "text/plain" });
       res.end(`You're using it wrong...`);
     });

@@ -5,6 +5,7 @@ const { createServer } = require('./src/server');
     const server = await createServer({
       port: process.env.PORT ? parseInt(process.env.PORT, 10) : 1234,
     });
+
     process.on('SIGINT', () => {
       console.log(`Shutting down...`);
       server.close(() => console.log('Bye!'));
