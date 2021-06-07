@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "author": "Yury Michurin <yury@nix.co.il>",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start:server": "node index.js"
   },
   "main": "src/client.js",
   "devDependencies": {

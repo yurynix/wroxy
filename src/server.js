@@ -74,6 +74,7 @@ function createServer(options) {
     // Now that server is running
     server.listen(options.port || PORT, options.host || HOST, (err) => {
       if (err) {
+        log(`Failed to start: ${err}`);
         return reject(err);
       }
 
