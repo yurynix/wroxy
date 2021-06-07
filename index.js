@@ -7,7 +7,7 @@ const { createServer } = require('./src/server');
     });
     process.on('SIGINT', () => {
       console.log(`Shutting down...`);
-      server.close();
+      server.close(() => console.log('Bye!'));
     });
   } catch(ex) {
     console.error(`Failed to start: ${ex}`);
